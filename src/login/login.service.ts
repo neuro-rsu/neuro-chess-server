@@ -1,4 +1,5 @@
-const  nano = require('../couch-db/couch-db')
+const clients = require('../helpers/clients')
+const nano = require('../couch-db/couch-db')
 
 class LoginService {
   getLogin() {
@@ -9,6 +10,12 @@ class LoginService {
       }).catch( err => res(err))
     })
   }
+
+  async createClient() {
+    return clients.constructor.createClient()
+  }
+
+
 }
 
 export = new LoginService()

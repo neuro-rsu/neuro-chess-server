@@ -12,6 +12,12 @@ const express = require('express'),
 const host = 'localhost'
 const port = 7000
 
+const sessionParser = session({
+    saveUninitialized: false,
+    secret: '$eCuRiTy',
+    resave: false
+});
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -19,34 +25,89 @@ app.use(function setCommonHeaders(req, res, next) {
     res.set("Access-Control-Allow-Private-Network", "true");
     res.set("Permissions-Policy", "interest-cohort=()")
     next();
-  });
+});
 
 app.use(cors());
 
 app.use('/api', routes)
 
+app.use(sessionParser);
+
 //initialize a simple http server
 const server = http.createServer(app);
 
+function onSocketError(err) {
+    console.error(err);
+}
+
+const map = new Map();
+
+server.on('upgrade', function (request, socket, head) {
+    socket.on('error', onSocketError);
+
+    console.log('Parsing session from request...');
+
+    sessionParser(request, {}, () => {
+      console.log('Parsing 222');
+      if (!request.session.userId) {
+        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+        socket.destroy();
+        return;
+      }
+
+      console.log(`Parsing ${request.session}`);
+      const clientId = 111
+
+      console.log('Session is parsed!');
+
+      socket.removeListener('error', onSocketError);
+
+      wss.handleUpgrade(request, socket, head, function (ws) {
+        wss.emit('connection', ws, request, clientId);
+      });
+    });
+  });
+
 //initialize the WebSocket server instance
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 
-wss.on('connection', (ws: WebSocket) => {
 
-    //connection is up, let's add a simple simple event
-    ws.on('message', (message: string) => {
+wss.on('connection', function (ws, request, client) {
+    const userId = client;
 
-        //log the received message and send it back to the client
-        console.log('received: %s', message);
-        ws.send(`Hello, you sent -> ${message}`);
+    //map.set(userId, ws);
+
+    ws.on('error', console.error);
+
+    ws.on('message', function (message) {
+      //
+      // Here we can now use session parameters.
+      //
+      console.log(`Received message ${message} from user ${userId}`);
+      ws.send(`Received message ${message} from user ${userId}`);
     });
 
-    //send immediatly a feedback to the incoming connection
-    ws.send('Hi there, I am a WebSocket server');
-});
+    ws.on('close', function () {
+    //   map.delete(userId);
+    });
+  });
+
+// wss.on('connection', (ws: WebSocket) => {
+
+//     //connection is up, let's add a simple simple event
+//     ws.on('message', (message: string) => {
+
+//         //log the received message and send it back to the client
+//         console.log('received: %s', message);
+//         ws.send(`Hello, you sent -> ${message}`);
+//     });
+
+//     //send immediatly a feedback to the incoming connection
+//     ws.send('Hi there, I am a WebSocket server');
+// });
 
 //start our server
-server.listen(process.env.PORT || 8999, () => {
+server.listen(port, () => {
     console.log(`Server started on port ${server.address().port} :)`);
 });
 

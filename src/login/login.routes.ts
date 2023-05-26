@@ -18,7 +18,7 @@ router.use(async (req, res, next) => {
 router
     .route('/')
     .get(LoginController.getLogin)
-// .post(LoginController.createLogin)
+    .post(LoginController.createLogin)
 //.put(LoginController.updateLogin)
 //.delete(LoginController.deleteLogin)
 
