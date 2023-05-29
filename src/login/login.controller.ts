@@ -16,13 +16,17 @@ class LoginController {
         .status(404)
         .send({ message: 'Hosts not found.' })
 
+    console.log(`Get session from user ${req.session.userId}`);
     return res.status(200).send({ data: req.hosts })
   }
 
   async createLogin(req, res) {
       let clientId = await LoginService.createClient()
+      if (req.session)
+        req.session.userId = clientId;
+      else
+        console.log(`Not session`);
 
-      console.log(`Updating session for user ${clientId}`);
       //req.session.userId = clientId;
 
       if (clientId) return res.status(200).send({clientId: clientId})
