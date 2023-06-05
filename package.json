@@ -16,6 +16,8 @@
     },
     "homepage": "https://github.com/neuro-rsu/neuro-chess-server#readme",
     "dependencies": {
+        "bcrypt": "^5.1.0",
+        "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
         "express": "^4.17.4",
         "express-session": "^1.17.3",
@@ -24,6 +26,7 @@
         "ws": "^8.13.0"
     },
     "devDependencies": {
+        "@types/bcrypt": "^5.0.0",
         "@types/express": "^4.17.14",
         "@types/express-session": "^1.17.7",
         "@types/node": "^18.11.18",
