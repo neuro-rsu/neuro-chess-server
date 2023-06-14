@@ -128,16 +128,16 @@ wss.on('connection', function (ws, request, client) {
         case "message":
           text = `(${timeStr}) ${msg.name} : ${msg.text} <br>`;
           break;
-        case "SingIn":
-          const saltRounds = 10
-          bcrypt
-          .hash(msg.text.password, saltRounds)
-          .then(hash => {
-          userHash = hash
-    console.log('Hash ', hash)
-    validateUser(hash)
-  })
-  .catch(err => console.error(err.message))
+  //       case "SingIn":
+  //         const saltRounds = 10
+  //         bcrypt
+  //         .hash(msg.text.password, saltRounds)
+  //         .then(hash => {
+  //         userHash = hash
+  //   console.log('Hash ', hash)
+  //   //validateUser(hash)
+  // })
+  // .catch(err => console.error(err.message))
         case "login":
             auth.getLogin(msg.text.login).then(res => {
               if (res.rows.length === 0 ) {
