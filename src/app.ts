@@ -101,9 +101,12 @@ server.on('upgrade', function (request, socket, head) {
 //initialize the WebSocket server instance
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 
+const whiteGameQueue = [];
+const blackGameQueue = [];
+const gameQueue = new Map();
 
 wss.on('connection', function (ws, request, client) {
-    const userId = client;
+    let userId = client;
 
     clientsMap.set(userId, ws);
 
@@ -127,6 +130,54 @@ wss.on('connection', function (ws, request, client) {
           break;
         case "message":
           text = `(${timeStr}) ${msg.name} : ${msg.text} <br>`;
+          break;
+        case "whitegame":
+          console.log(`white: ${userId}`);
+          if (blackGameQueue.length !== 0)
+          {
+            const blackUserUlid = blackGameQueue.pop();
+            const gameUlid = ULID.ulid()
+            let game = {whiteUser: userId, blackUser: blackUserUlid, game: gameUlid}
+            console.log(`WhiteGame: ${game}`);
+            gameQueue.set(gameUlid, game);
+            const answerMsg = {
+              type: "game",
+              text: `Игра нашлась`,
+              data: game,
+              id: 111,
+              date: Date.now(),
+            };
+            const blackWS = clientsMap.get(blackUserUlid);
+            blackWS.send(JSON.stringify(answerMsg));
+            ws.send(JSON.stringify(answerMsg));
+          }
+          else {
+            whiteGameQueue.push(userId)
+          }
+          break;
+        case "blackgame":
+          console.log(`black: ${userId}`);
+          if (whiteGameQueue.length !== 0)
+          {
+            const whiteUserUlid = whiteGameQueue.pop();
+            const gameUlid = ULID.ulid()
+            let game = {whiteUser: whiteUserUlid, blackUser: userId, game: gameUlid}
+            console.log(`blackGame: ${game}`);
+            gameQueue.set(gameUlid, game);
+            const answerMsg = {
+              type: "game",
+              text: `Игра нашлась`,
+              data: game,
+              id: 111,
+              date: Date.now(),
+            };
+            const blackWS = clientsMap.get(whiteUserUlid);
+            blackWS.send(JSON.stringify(answerMsg));
+            ws.send(JSON.stringify(answerMsg));
+          }
+          else {
+            blackGameQueue.push(userId)
+          }
           break;
   //       case "SingIn":
   //         const saltRounds = 10
@@ -159,6 +210,7 @@ wss.on('connection', function (ws, request, client) {
                       id: 111,
                       date: Date.now(),
                     };
+                    userId = user.doc.login;
                     ws.send(JSON.stringify(answerMsg));
                   }
                   else {
