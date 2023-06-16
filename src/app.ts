@@ -131,6 +131,25 @@ wss.on('connection', function (ws, request, client) {
         case "message":
           text = `(${timeStr}) ${msg.name} : ${msg.text} <br>`;
           break;
+        case "step":
+          const step = msg.data;
+          let message = {
+            game: ws.game.game,
+            user: ws.game.kind ? ws.game.whiteUser: ws.game.blackUser,
+            enemy: !ws.game.kind ? ws.game.whiteUser: ws.game.blackUser,
+            step: step
+          }
+
+          const answerMsg = {
+            type: "enemyStep",
+            text: `step`,
+            data: step,
+            id: 111,
+            date: Date.now(),
+          };
+          const enemyWS = clientsMap.get(step.enemy);
+          enemyWS.send(JSON.stringify(answerMsg));
+          break;
         case "whitegame":
           console.log(`white: ${userId}`);
           if (blackGameQueue.length !== 0)
