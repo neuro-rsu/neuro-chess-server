@@ -93,9 +93,6 @@ server.on('upgrade', function (request, socket, head) {
     wss.handleUpgrade(request, socket, head, function (ws) {
       wss.emit('connection', ws, request, clientId);
     });
-
-
-
   });
 
 //initialize the WebSocket server instance
@@ -132,13 +129,10 @@ wss.on('connection', function (ws, request, client) {
           text = `(${timeStr}) ${msg.name} : ${msg.text} <br>`;
           break;
         case "step":
-          const step = msg.data;
-          let message = {
-            game: ws.game.game,
-            user: ws.game.kind ? ws.game.whiteUser: ws.game.blackUser,
-            enemy: !ws.game.kind ? ws.game.whiteUser: ws.game.blackUser,
-            step: step
-          }
+          const data = msg.text;
+          const step = data.step;
+          console.log(`data: ${JSON.stringify(data)}`);
+          console.log(`step: ${JSON.stringify(step)}`);
 
           const answerMsg = {
             type: "enemyStep",
@@ -147,7 +141,7 @@ wss.on('connection', function (ws, request, client) {
             id: 111,
             date: Date.now(),
           };
-          const enemyWS = clientsMap.get(step.enemy);
+          const enemyWS = clientsMap.get(data.enemy);
           enemyWS.send(JSON.stringify(answerMsg));
           break;
         case "whitegame":
@@ -171,11 +165,12 @@ wss.on('connection', function (ws, request, client) {
             ws.send(JSON.stringify(answerMsg));
           }
           else {
+            console.log(`whiteGameQueue: ${userId}`);
             whiteGameQueue.push(userId)
           }
           break;
         case "blackgame":
-          console.log(`black: ${userId}`);
+          console.log(`blackgame: ${userId}`);
           if (whiteGameQueue.length !== 0)
           {
             const whiteUserUlid = whiteGameQueue.pop();
@@ -229,7 +224,10 @@ wss.on('connection', function (ws, request, client) {
                       id: 111,
                       date: Date.now(),
                     };
-                    userId = user.doc.login;
+
+                    clientsMap.delete(userId);
+                    userId = user.doc._id;
+                    clientsMap.set(userId, ws);
                     ws.send(JSON.stringify(answerMsg));
                   }
                   else {

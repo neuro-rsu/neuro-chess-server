@@ -9,12 +9,13 @@
         "competition",
         "server"
     ],
-    "author": "Vladislav Antoshkin",
+    "author": "Arsenov Anton",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/neuro-rsu/neuro-chess-server/issues"
     },
     "homepage": "https://github.com/neuro-rsu/neuro-chess-server#readme",
+
     "dependencies": {
         "bcrypt": "^5.1.0",
         "cookie-parser": "^1.4.6",
