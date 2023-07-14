@@ -1,17 +1,24 @@
 {
     "compilerOptions": {
       "types": ["node"],
-      "target": "es6",
-      "module": "commonjs",
+      "target": "ES2017",
+      "module": "ES6",
       "outDir": "dist",
       "sourceMap": true,
+      "moduleResolution": "node",
+      "allowSyntheticDefaultImports": true,
+      "baseUrl": "./",
       "typeRoots": [
         "node_modules/@types",
-        "src/types"
-    ]
+        "src/@types"
+      ],
+      "paths": {
+        "*": [ "src/@types/*"]
+    }
     },
     "include": [
-      "src/**/*.ts"
+      "src/**/*.ts",
+      ".env"
     ],
     "exclude": [
       "node_modules",

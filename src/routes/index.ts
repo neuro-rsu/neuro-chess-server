@@ -1,10 +1,11 @@
 import type { Router } from "express";
 
-const express = require('express'),
-    router: Router = express.Router(),
-    loginRoutes = require('../login/login.routes')
+import express from 'express'
 
-router.use('/login', loginRoutes)
+const router: Router = express.Router()
 
+import signUpRoutes from '../sign-up/sign-up.routes.js'
 
-export = router
+router.use('/signup', signUpRoutes)
+
+export default router

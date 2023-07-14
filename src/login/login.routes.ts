@@ -22,4 +22,4 @@ router
 //.put(LoginController.updateLogin)
 //.delete(LoginController.deleteLogin)
 
-export = router
+export default router

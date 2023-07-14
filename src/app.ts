@@ -1,22 +1,41 @@
-import ULID = require('ulid')
 import type { Express, Router, Request, Response } from 'express'
+
+import * as ULID from 'ulid';
+
+import 'dotenv/config'
+
+import express from 'express'
+
+import cors from 'cors'
+
+import http from 'http'
+
+import session from 'express-session'
+
+import routes from './routes/index.js'
+
+import { AddressInfo } from 'net'
 
 import * as WebSocket from 'ws';
 
-const express = require('express'),
-   app: Express = express(),
-   session = require('express-session'),
-   routes: Router = require('./routes/index'),
-   http = require('http'),
-   cors = require('cors'),
-   auth = require('./auth/auth.service'),
-   bcrypt = require("bcrypt")
+import { WebSocketServer } from 'ws'
 
-const host = 'localhost'
-const port = 7000
+import i18next from 'i18next'
+
+import i18nextMiddleware from 'i18next-express-middleware'
+
+import auth from './auth/auth.service.js'
+
+
+
+
+import bcrypt from 'bcrypt'
+
+import jwt from 'jsonwebtoken'
+
+const app: Express = express()
 
 const clientsMap = new Map();
-
 
 const sessionParser = session({
     saveUninitialized: false,
@@ -46,7 +65,7 @@ app.use(function setCommonHeaders(req, res, next) {
 
 app.use(cors());
 
-//app.use('/api', routes)
+app.use('/api', routes)
 
 app.post('/login', function (req, res) {
   //
@@ -96,7 +115,7 @@ server.on('upgrade', function (request, socket, head) {
   });
 
 //initialize the WebSocket server instance
-const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
+const wss = new WebSocketServer({ clientTracking: false, noServer: true });
 
 const whiteGameQueue = [];
 const blackGameQueue = [];
@@ -204,7 +223,7 @@ wss.on('connection', function (ws, request, client) {
   // })
   // .catch(err => console.error(err.message))
         case "login":
-            auth.getLogin(msg.text.login).then(res => {
+            auth.getLogin(msg.text.login).then((res: any) => {
               if (res.rows.length === 0 ) {
                 const answerMsg = {
                   type: "authError",
@@ -270,8 +289,8 @@ wss.on('connection', function (ws, request, client) {
 // });
 
 //start our server
-server.listen(port, () => {
-    console.log(`Server started on port ${server.address().port} :)`);
+server.listen(process.env.PORT, () => {
+    console.log(`Server started on port ${(server.address() as AddressInfo).port} :)`);
 });
 
 

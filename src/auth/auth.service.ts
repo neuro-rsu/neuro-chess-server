@@ -1,5 +1,5 @@
-const clients = require('../helpers/clients')
-const nano = require('../couch-db/couch-db')
+import nano from '../couch-db/couch-db.js'
+import {default as clients,  Clients}  from '../helpers/clients.js'
 
 class AuthService {
   getLogin(user) {
@@ -12,8 +12,10 @@ class AuthService {
   }
 
   async createClient() {
-    return clients.constructor.createClient()
+    return Clients.createClient()
   }
 }
 
-export = new AuthService()
+const authService: AuthService = new AuthService()
+
+export default authService

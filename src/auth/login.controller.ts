@@ -37,4 +37,6 @@ class LoginController {
   }
 }
 
-export = new LoginController()
+const loginController: LoginController = new LoginController()
+
+export default loginController

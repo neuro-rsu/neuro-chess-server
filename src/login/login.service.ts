@@ -18,4 +18,6 @@ class LoginService {
 
 }
 
-export = new LoginService()
+const loginService: LoginService = new LoginService()
+
+export default loginService
